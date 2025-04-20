@@ -1,0 +1,313 @@
+`timescale 1ns / 1ps
+
+module Decoder_2To4(input wire A1,A0, output wire Y3,Y2,Y1,Y0);
+assign Y3 = A1&A0;
+assign Y2 = A1&(~A0) ;
+assign Y1 =(~A1)&A0 ;
+assign Y0 = (~A1)&(~A0);
+endmodule
+
+`timescale 1ps / 1ps
+
+module Decoder_2To4_TB();
+reg A1,A0;
+wire Y3,Y2,Y1,Y0;
+Decoder_2To4 test(A1,A0,Y3,Y2,Y1,Y0);
+initial begin
+assign A1=0; assign A0 = 0; #5;
+assign A1=0; assign A0 = 1; #5;
+assign A1=1; assign A0 = 0; #5;
+assign A1=1; assign A0 = 1; #5;
+
+$finish;
+end
+
+endmodule
+
+set_property PACKAGE_PIN V17 [get_ports {A0}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {A0}]
+set_property PACKAGE_PIN V16 [get_ports {A1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {A1}]
+set_property PACKAGE_PIN U16 [get_ports {Y0}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Y0}]
+set_property PACKAGE_PIN E19 [get_ports {Y1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Y1}]
+set_property PACKAGE_PIN U19 [get_ports {Y2}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Y2}]
+set_property PACKAGE_PIN V19 [get_ports {Y3}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Y3}]
+set_property PACKAGE_PIN W18 [get_ports {LED{Y4}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Y4}]
+
+`timescale 1ns / 1ps
+
+module MUX_2To1(input wire S,D1,D0, output wire Y);
+assign Y = (~S&D0) | ( S & D1);
+endmodule
+
+`timescale 1ps / 1ps
+
+
+
+module MUX_2To1_TB();
+reg S,D1,D0;
+wire Y;
+
+MUX_2To1 test(S,D1,D0,Y);
+initial begin
+assign S = 0; D1 = 0; D0 = 0; #5;
+assign S = 0; D1 = 0; D0 = 1; #5;
+assign S = 0; D1 = 1; D0 = 0; #5;
+assign S = 0; D1 = 1; D0 = 1; #5;
+assign S = 1; D1 = 0; D0 = 0; #5;
+assign S = 1; D1 = 0; D0 = 1; #5;
+assign S = 1; D1 = 1; D0 = 0; #5;
+assign S = 1; D1 = 1; D0 = 1; #5;
+
+
+$finish;
+end
+endmodule
+
+set_property PACKAGE_PIN V17 [get_ports {D0}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D0}]
+set_property PACKAGE_PIN V16 [get_ports {D1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D1}]
+set_property PACKAGE_PIN W16 [get_ports {S}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {S}]
+set_property PACKAGE_PIN U16 [get_ports {Y}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Y}]
+
+`timescale 1ps / 1ps
+
+module MUX_4To1(input wire S1,S0,D3,D2,D1,D0,output wire Y);
+wire w1,w2;
+MUX_2To1 A(S0,D3,D2,w2);
+MUX_2To1 B(S0,D1,D0,w1);
+MUX_2To1 C(S1,w2,w1,Y);
+
+
+endmodule
+
+`timescale 1ps / 1ps
+
+
+module MUX_4To1_TB();
+reg S1,S0,D3,D2,D1,D0;
+wire Y;
+MUX_4To1 test(S1,S0,D3,D2,D1,D0,Y);
+initial begin 
+assign S1 = 0; assign S0 = 0; 
+assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 1; #5;
+assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S1 = 0; assign S0 = 1; 
+assign D3 = 0;assign D2 = 0;assign D1 = 1;assign D0 = 0; #5;
+assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S1 = 1; assign S0 = 0; 
+assign D3 = 0;assign D2 = 1;assign D1 = 0;assign D0 = 0; #5;
+assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S1 = 1; assign S0 = 1; 
+assign D3 = 1;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+
+$finish;
+end
+endmodule
+
+`timescale 1ps / 1ps
+
+module MUX_4To1_DF(input wire S1,S0,D3,D2,D1,D0,output reg Y);
+always @* begin
+if(S1 == 1'b0 & S0 == 1'b0)
+Y = D0;
+else if (S1 == 1'b0 & S0 == 1'b1)
+Y = D1;
+else if (S1 == 1'b1 & S0 == 1'b0)
+Y = D2;
+else if (S1 == 1'b1 & S0 == 1'b1)
+Y = D3;
+end
+endmodule
+
+`timescale 1ps / 1ps
+
+
+module MUX_4To1_DF_TB();
+reg S1,S0,D3,D2,D1,D0;
+wire Y;
+MUX_4To1_DF test(S1,S0,D3,D2,D1,D0,Y);
+initial begin 
+assign S1 = 0; assign S0 = 0; 
+assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 1; #5;
+assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S1 = 0; assign S0 = 1; 
+assign D3 = 0;assign D2 = 0;assign D1 = 1;assign D0 = 0; #5;
+assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S1 = 1; assign S0 = 0; 
+assign D3 = 0;assign D2 = 1;assign D1 = 0;assign D0 = 0; #5;
+assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S1 = 1; assign S0 = 1; 
+assign D3 = 1;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+
+$finish;
+end
+endmodule
+set_property PACKAGE_PIN V17 [get_ports {D0}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D0}]
+set_property PACKAGE_PIN V16 [get_ports {D1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D1}]
+set_property PACKAGE_PIN W16 [get_ports {D2}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D2}]
+set_property PACKAGE_PIN W17 [get_ports {D3}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D3}]
+set_property PACKAGE_PIN W15 [get_ports {S0}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {S0}]
+set_property PACKAGE_PIN V15 [get_ports {S1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {S1}]
+set_property PACKAGE_PIN U16 [get_ports {Y}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Y}]
+
+`timescale 1ps / 1ps
+
+module MUX_8To1(input wire S2,S1,S0,D7,D6,D5,D4,D3,D2,D1,D0,output wire Y);
+wire w1,w2,w3,w4;
+MUX_4To1 A(S1,S0,D7,D6,D5,D4,w2);
+MUX_4To1 B(S1,S0,D3,D2,D1,D0,w1);
+assign Y = (~S2 &w1) | ( S2 & w2);
+endmodule
+
+`timescale 1ps / 1ps
+
+
+module MUX_8To1_TB();
+reg S2,S1,S0,D7,D6,D5,D4,D3,D2,D1,D0;
+wire Y;
+
+MUX_8To1 test(S2,S1,S0,D7,D6,D5,D4,D3,D2,D1,D0,Y);
+initial begin
+assign S2 =0 ; assign S1 = 0; assign S0 = 0; 
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 1; #5;
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S2 =0 ; assign S1 = 0; assign S0 = 1; 
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 1;assign D0 = 0; #5;
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S2 =0 ; assign S1 = 1; assign S0 = 0; 
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 1;assign D1 = 0;assign D0 = 0; #5;
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S2 =0 ; assign S1 = 1; assign S0 = 1; 
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 1;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S2 =1 ; assign S1 = 0; assign S0 = 0; 
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 1;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S2 =1 ; assign S1 = 0; assign S0 = 1; 
+assign D7 = 0; assign D6 = 0;assign D5 = 1;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S2 =1 ; assign S1 = 1; assign S0 = 0; 
+assign D7 = 0; assign D6 = 1;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign S2 =1 ; assign S1 = 1; assign S0 = 1; 
+assign D7 = 1; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+assign D7 = 0; assign D6 = 0;assign D5 = 0;assign D4 = 0;assign D3 = 0;assign D2 = 0;assign D1 = 0;assign D0 = 0; #5;
+
+$finish;
+end
+endmodule
+
+set_property PACKAGE_PIN V17 [get_ports {D0}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D0}]
+set_property PACKAGE_PIN V16 [get_ports {D1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D1}]
+set_property PACKAGE_PIN W16 [get_ports {D2}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D2}]
+set_property PACKAGE_PIN W17 [get_ports {D3}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D3}]
+set_property PACKAGE_PIN W15 [get_ports {D4}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D4}]
+set_property PACKAGE_PIN V15 [get_ports {D5}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D5}]
+set_property PACKAGE_PIN W14 [get_ports {D6}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D6}]
+set_property PACKAGE_PIN W13 [get_ports {D7}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D7}]
+set_property PACKAGE_PIN V2 [get_ports {S0}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {S0}]
+set_property PACKAGE_PIN T3 [get_ports {S1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {S1}]
+set_property PACKAGE_PIN T2 [get_ports {S2}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {S2}]
+set_property PACKAGE_PIN U16 [get_ports {Y}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Y}]
+
+`timescale 1ns / 1ps
+
+module Function_F(input wire A,B,C,D,E, output wire F);
+wire w3,w2,w1,w0;
+Decoder_2To4 decoder(A,B,w3,w2,w1,w0);
+MUX_8To1 mux(C,D,E,w2,1'b0,~A,w0,B,1'b1,w1,w3,F);
+endmodule
+
+`timescale 1ps / 1ps
+
+
+
+module Function_F_TB();
+
+
+reg A,B,C,D,E;
+wire F;
+Function_F test(A,B,C,D,E,F);
+initial begin
+assign A = 0; assign B=0; assign C=0; assign D=0; assign E = 0; #5;
+assign A = 0; assign B=0; assign C=0; assign D=0; assign E = 1; #5;
+assign A = 0; assign B=0; assign C=0; assign D=1; assign E = 0; #5;
+assign A = 0; assign B=0; assign C=0; assign D=1; assign E = 1; #5;
+assign A = 0; assign B=0; assign C=1; assign D=0; assign E = 0; #5;
+assign A = 0; assign B=0; assign C=1; assign D=0; assign E = 1; #5;
+assign A = 0; assign B=0; assign C=1; assign D=1; assign E = 0; #5;
+assign A = 0; assign B=0; assign C=1; assign D=1; assign E = 1; #5;
+assign A = 0; assign B=1; assign C=0; assign D=0; assign E = 0; #5;
+assign A = 0; assign B=1; assign C=0; assign D=0; assign E = 1; #5;
+assign A = 0; assign B=1; assign C=0; assign D=1; assign E = 0; #5;
+assign A = 0; assign B=1; assign C=0; assign D=1; assign E = 1; #5;
+assign A = 0; assign B=1; assign C=1; assign D=0; assign E = 0; #5;
+assign A = 0; assign B=1; assign C=1; assign D=0; assign E = 1; #5;
+assign A = 0; assign B=1; assign C=1; assign D=1; assign E = 0; #5;
+assign A = 0; assign B=1; assign C=1; assign D=1; assign E = 1; #5;
+assign A = 1; assign B=0; assign C=0; assign D=0; assign E = 0; #5;
+assign A = 1; assign B=0; assign C=0; assign D=0; assign E = 1; #5;
+assign A = 1; assign B=0; assign C=0; assign D=1; assign E = 0; #5;
+assign A = 1; assign B=0; assign C=0; assign D=1; assign E = 1; #5;
+assign A = 1; assign B=0; assign C=1; assign D=0; assign E = 0; #5;
+assign A = 1; assign B=0; assign C=1; assign D=0; assign E = 1; #5;
+assign A = 1; assign B=0; assign C=1; assign D=1; assign E = 0; #5;
+assign A = 1; assign B=0; assign C=1; assign D=1; assign E = 1; #5;
+assign A = 1; assign B=1; assign C=0; assign D=0; assign E = 0; #5;
+assign A = 1; assign B=1; assign C=0; assign D=0; assign E = 1; #5;
+assign A = 1; assign B=1; assign C=0; assign D=1; assign E = 0; #5;
+assign A = 1; assign B=1; assign C=0; assign D=1; assign E = 1; #5;
+assign A = 1; assign B=1; assign C=1; assign D=0; assign E = 0; #5;
+assign A = 1; assign B=1; assign C=1; assign D=0; assign E = 1; #5;
+assign A = 1; assign B=1; assign C=1; assign D=1; assign E = 0; #5;
+assign A = 1; assign B=1; assign C=1; assign D=1; assign E = 1; #5;
+
+
+
+$finish;
+end
+endmodule
+
+set_property PACKAGE_PIN V17 [get_ports {A}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {A}]
+set_property PACKAGE_PIN V16 [get_ports {B}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {B}]
+set_property PACKAGE_PIN W16 [get_ports {C}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {C}]
+set_property PACKAGE_PIN W17 [get_ports {D}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D}]
+set_property PACKAGE_PIN W15 [get_ports {E}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {E}]
+set_property PACKAGE_PIN U16 [get_ports {F}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {F}]
+
