@@ -1,0 +1,105 @@
+`timescale 1ns / 1ps
+
+module MUX_2To1(input wire S,D1,D0, output wire Y);
+assign Y = (~S&D0) | ( S & D1);
+endmodule
+
+`timescale 1ps / 1ps
+
+
+
+module MUX_4To1(input wire S1,S0,D3,D2,D1,D0,output wire Y);
+wire w1,w2;
+MUX_2To1 A(S0,D3,D2,w2);
+MUX_2To1 B(S0,D1,D0,w1);
+MUX_2To1 C(S1,w2,w1,Y);
+
+
+endmodule
+
+`timescale 1ps / 1ps
+module MF_Register(input wire d0,d1,d2,d3,s0,s1,shr_ln,shl_ln,reset,input reg clk, output reg q0,q1,q2,q3);
+wire w0,w1,w2,w3;
+MUX_4To1 A(s1,s0,q1,shr_ln,d0,q0,w0);
+MUX_4To1 B(s1,s0,q2,q0,d1,q1,w1);
+MUX_4To1 C(s1,s0,q3,q1,d2,q2,w2);
+MUX_4To1 D(s1,s0,shl_ln,q2,d3,q3,w3);
+D_S_FF A1(clk,reset,w0,q0);
+D_S_FF B1(clk,reset,w1,q1);
+D_S_FF C1(clk,reset,w2,q2);
+D_S_FF D1(clk,reset,w3,q3);
+
+
+endmodule
+
+`timescale 1ps / 1ps
+
+
+
+module D_S_FF(input wire clk,
+ input wire reset,
+ input wire  d,
+ output reg q);
+
+ always_ff @(posedge clk, posedge reset)
+ if (reset) q <= 1'b0;
+ else q <= d;
+endmodule
+
+
+`timescale 1ps / 1ps
+module MF_Register_TB();
+reg d0,d1,d2,d3,s0,s1,shr_ln,shl_ln,reset,clk;
+wire q0,q1,q2,q3;
+MF_Register test(d0,d1,d2,d3,s0,s1,shr_ln,shl_ln,reset,clk,q0,q1,q2,q3);
+initial begin
+    clk = 0;
+    forever #1 clk = ~clk; 
+  end
+ initial begin
+ assign d0 = 1'b1; assign d1 = 1'b1; assign d2 = 1'b1; assign d3 = 1'b1; assign shr_ln = 1'b1; assign shl_ln = 1'b0; #5;
+ 
+assign  reset =1'b0; assign s1 = 1'b0; assign s0 = 1'b1; #10;
+//assign  reset =1'b1; #5;
+assign  reset =1'b0; assign s1 = 1'b0; assign s0 = 1'b0; #20;
+/*assign  reset =1'b0; assign s1 = 1'b0; assign s0 = 1'b0; #10;
+assign  reset =1'b0; assign s1 = 1'b1; assign s0 = 1'b0; #10;
+assign  reset =1'b0; assign s1 = 1'b0; assign s0 = 1'b1; #10;*/
+assign  reset =1'b0; assign s1 = 1'b1; assign s0 = 1'b1; #20;
+assign  reset =1'b0; assign s1 = 1'b1; assign s0 = 1'b0; #20;
+
+$finish;
+
+end
+
+endmodule
+
+
+set_property PACKAGE_PIN W5 [get_ports clk] 
+    set_property IOSTANDARD LVCMOS33 [get_ports clk]
+set_property PACKAGE_PIN V17 [get_ports {d0}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {d0}]
+set_property PACKAGE_PIN V16 [get_ports {d1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {d1}]
+set_property PACKAGE_PIN W16 [get_ports {d2}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {d2}]
+set_property PACKAGE_PIN W17 [get_ports {d3}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {d3}]
+set_property PACKAGE_PIN W15 [get_ports {s0}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {s0}]
+set_property PACKAGE_PIN V15 [get_ports {s1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {s1}]
+set_property PACKAGE_PIN W14 [get_ports {shr_ln}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {shr_ln}]
+set_property PACKAGE_PIN W13 [get_ports {shl_ln}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {shl_ln}]
+set_property PACKAGE_PIN V2 [get_ports {reset}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {reset}]
+set_property PACKAGE_PIN U16 [get_ports {q0}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {q0}]
+set_property PACKAGE_PIN E19 [get_ports {q1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {q1}]
+set_property PACKAGE_PIN U19 [get_ports {q2}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {q2}]
+set_property PACKAGE_PIN V19 [get_ports {q3}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {q3}]
