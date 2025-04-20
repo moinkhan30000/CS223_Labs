@@ -1,0 +1,279 @@
+`timescale 1ns / 1ps
+
+
+module Full_Adder_B( input wire A,B,Cin, 
+output wire Sum,Cout);
+assign Cout = (A&B)+(B&Cin)+(Cin&A);
+assign Sum = A^B^Cin;
+
+
+endmodule
+
+
+
+`timescale 1ns / 1ps
+
+
+module Full_Adder_S( input wire A,B,Cin, output wire Sum , Cout);
+wire w1,w2,w3;
+assign w1 = A^B;
+assign w2 = A&B;
+assign Sum = w1^Cin;
+assign w3 = Cin&w1;
+assign Cout = w3|w2;
+endmodule
+
+
+`timescale 1ns / 1ps
+
+
+module Full_Subtractor( input wire A,B,Bin, output wire D ,Bout);
+wire w1,w2,w3,w4,w5;
+assign w1 = A^B;
+assign w2 = ~A;
+assign w3 = w2&B;
+assign w4 = ~w1;
+assign D = Bin^w1;
+assign w5 = Bin&w4;
+assign Bout = w5|w3;
+
+endmodule
+
+
+`timescale 1ns / 1ps
+
+module Two_Bit_Adder(input wire A1,A2,B1,B2,Cin,output wire S1,S2,Cout);
+wire w1;
+Full_Adder_S first(A1,B1,Cin,S1,w1);
+Full_Adder_S second(A2,B2,w1,S2,Cout);
+
+endmodule
+
+
+`timescale 1ps / 1ps
+
+
+module Full_Adder_B_TB();
+reg A,B,Cin;
+wire Sum,Cout;
+Full_Adder_B tb(A,B,Cin,Sum,Cout);
+initial begin
+assign A = 0;  
+assign B = 0;  
+assign Cin = 0;
+#5;
+assign A = 0;  
+assign B = 0;  
+assign Cin = 1;
+#5;
+assign A = 0;  
+assign B = 1;  
+assign Cin = 0;
+#5;
+assign A = 0;  
+assign B = 1;  
+assign Cin = 1;
+#5;
+assign A = 1;  
+assign B = 0;  
+assign Cin = 0;
+#5;
+assign A = 1;  
+assign B = 0;  
+assign Cin = 1;
+#5;
+assign A = 1;  
+assign B = 1;  
+assign Cin = 0;
+#5;
+assign A = 1;  
+assign B = 1;  
+assign Cin = 1;
+#5;
+$finish;
+
+end
+endmodule
+
+
+
+`timescale 1ps / 1ps
+
+
+module Full_Adder_S_TB();
+reg A,B,Cin;
+wire Sum,Cout;
+Full_Adder_S tb(A,B,Cin,Sum,Cout);
+initial begin
+assign A = 0;  
+assign B = 0;  
+assign Cin = 0;
+#5;
+assign A = 0;  
+assign B = 0;  
+assign Cin = 1;
+#5;
+assign A = 0;  
+assign B = 1;  
+assign Cin = 0;
+#5;
+assign A = 0;  
+assign B = 1;  
+assign Cin = 1;
+#5;
+assign A = 1;  
+assign B = 0;  
+assign Cin = 0;
+#5;
+assign A = 1;  
+assign B = 0;  
+assign Cin = 1;
+#5;
+assign A = 1;  
+assign B = 1;  
+assign Cin = 0;
+#5;
+assign A = 1;  
+assign B = 1;  
+assign Cin = 1;
+#5;
+
+$finish;
+
+end
+endmodule
+
+`timescale 1ps / 1ps
+
+module Full_Subtractor_TB();
+reg A,B,Bin;
+wire D,Bout;
+Full_Subtractor tb(A,B,Bin,D,Bout);
+initial begin
+assign A = 0;  
+assign B = 0;  
+assign Bin = 0;
+#5;
+assign A = 0;  
+assign B = 0;  
+assign Bin = 1;
+#5;
+assign A = 0;  
+assign B = 1;  
+assign Bin = 0;
+#5;
+assign A = 0;  
+assign B = 1;  
+assign Bin = 1;
+#5;
+assign A = 1;  
+assign B = 0;  
+assign Bin = 0;
+#5;
+assign A = 1;  
+assign B = 0;  
+assign Bin = 1;
+#5;
+assign A = 1;  
+assign B = 1;  
+assign Bin = 0;
+#5;
+assign A = 1;  
+assign B = 1;  
+assign Bin = 1;
+#5;
+$finish;
+
+end
+endmodule
+
+`timescale 1ps / 1ps
+
+module Two_Bit_Adder_TB();
+reg A1,A2,B1,B2,Cin;
+wire S1,S2,Cout;
+Two_Bit_Adder test(A1,A2,B1,B2,Cin,S1,S2,Cout);
+initial begin
+assign A1 = 0; assign A2 = 0 ;  assign B1 = 0; assign B2 = 0 ;assign Cin = 0; #5;
+assign A1 = 0; assign A2 = 0 ;  assign B1 = 0; assign B2 = 0 ;assign Cin = 1; #5; 
+assign A1 = 0; assign A2 = 0 ;  assign B1 = 0; assign B2 = 1 ;assign Cin = 0; #5; 
+assign A1 = 0; assign A2 = 0 ;  assign B1 = 0; assign B2 = 1 ;assign Cin = 1; #5; 
+assign A1 = 0; assign A2 = 0 ;  assign B1 = 1; assign B2 = 0 ;assign Cin = 0; #5; 
+assign A1 = 0; assign A2 = 0 ;  assign B1 = 1; assign B2 = 0 ;assign Cin = 1; #5; 
+assign A1 = 0; assign A2 = 0 ;  assign B1 = 1; assign B2 = 1 ;assign Cin = 0; #5; 
+assign A1 = 0; assign A2 = 0 ;  assign B1 = 1; assign B2 = 1 ;assign Cin = 1; #5; 
+assign A1 = 0; assign A2 = 1 ;  assign B1 = 0; assign B2 = 0 ;assign Cin = 0; #5; 
+assign A1 = 0; assign A2 = 1 ;  assign B1 = 0; assign B2 = 0 ;assign Cin = 1; #5; 
+assign A1 = 0; assign A2 = 1 ;  assign B1 = 0; assign B2 = 1 ;assign Cin = 0; #5; 
+assign A1 = 0; assign A2 = 1 ;  assign B1 = 0; assign B2 = 1 ;assign Cin = 1; #5; 
+assign A1 = 0; assign A2 = 1 ;  assign B1 = 1; assign B2 = 0 ;assign Cin = 0; #5; 
+assign A1 = 0; assign A2 = 1 ;  assign B1 = 1; assign B2 = 0 ;assign Cin = 1; #5; 
+assign A1 = 0; assign A2 = 1 ;  assign B1 = 1; assign B2 = 1 ;assign Cin = 0; #5; 
+assign A1 = 0; assign A2 = 1 ;  assign B1 = 1; assign B2 = 1 ;assign Cin = 1; #5; 
+assign A1 = 1; assign A2 = 0 ;  assign B1 = 0; assign B2 = 0 ;assign Cin = 0; #5; 
+assign A1 = 1; assign A2 = 0 ;  assign B1 = 0; assign B2 = 0 ;assign Cin = 1; #5; 
+assign A1 = 1; assign A2 = 0 ;  assign B1 = 0; assign B2 = 1 ;assign Cin = 0; #5; 
+assign A1 = 1; assign A2 = 0 ;  assign B1 = 0; assign B2 = 1 ;assign Cin = 1; #5; 
+assign A1 = 1; assign A2 = 0 ;  assign B1 = 1; assign B2 = 0 ;assign Cin = 0; #5; 
+assign A1 = 1; assign A2 = 0 ;  assign B1 = 1; assign B2 = 0 ;assign Cin = 1; #5; 
+assign A1 = 1; assign A2 = 0 ;  assign B1 = 1; assign B2 = 1 ;assign Cin = 0; #5; 
+assign A1 = 1; assign A2 = 0 ;  assign B1 = 1; assign B2 = 1 ;assign Cin = 1; #5; 
+assign A1 = 1; assign A2 = 1 ;  assign B1 = 0; assign B2 = 0 ;assign Cin = 0; #5; 
+assign A1 = 1; assign A2 = 1 ;  assign B1 = 0; assign B2 = 0 ;assign Cin = 1; #5; 
+assign A1 = 1; assign A2 = 1 ;  assign B1 = 0; assign B2 = 1 ;assign Cin = 0; #5; 
+assign A1 = 1; assign A2 = 1 ;  assign B1 = 0; assign B2 = 1 ;assign Cin = 1; #5; 
+assign A1 = 1; assign A2 = 1 ;  assign B1 = 1; assign B2 = 0 ;assign Cin = 0; #5; 
+assign A1 = 1; assign A2 = 1 ;  assign B1 = 1; assign B2 = 0 ;assign Cin = 1; #5; 
+assign A1 = 1; assign A2 = 1 ;  assign B1 = 1; assign B2 = 1 ;assign Cin = 0; #5; 
+assign A1 = 1; assign A2 = 1 ;  assign B1 = 1; assign B2 = 1 ;assign Cin = 1; #5;  
+
+$finish;
+end
+
+
+
+set_property PACKAGE_PIN V17 [get_ports {A}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {A}]
+set_property PACKAGE_PIN V16 [get_ports {B}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {B}]
+set_property PACKAGE_PIN W16 [get_ports {Cin}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Cin}]
+	set_property PACKAGE_PIN U16 [get_ports {Sum}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Sum}]
+set_property PACKAGE_PIN E19 [get_ports {Cout}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Cout}]
+
+
+
+
+
+
+set_property PACKAGE_PIN V17 [get_ports {A}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {A}]
+set_property PACKAGE_PIN V16 [get_ports {B}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {B}]
+set_property PACKAGE_PIN W16 [get_ports {Bin}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Bin}]
+	set_property PACKAGE_PIN U16 [get_ports {D}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {D}]
+set_property PACKAGE_PIN E19 [get_ports {Bout}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Bout}]
+
+
+
+set_property PACKAGE_PIN V17 [get_ports {A1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {A1}]
+set_property PACKAGE_PIN V16 [get_ports {A2}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {A2}]
+set_property PACKAGE_PIN W16 [get_ports {B1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {B1}]
+set_property PACKAGE_PIN W17 [get_ports {B2}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {B2}]
+set_property PACKAGE_PIN W15 [get_ports {Cin}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Cin}]
+set_property PACKAGE_PIN U16 [get_ports {S1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {S1}]
+set_property PACKAGE_PIN E19 [get_ports {S2}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {S2}]
+set_property PACKAGE_PIN U19 [get_ports {Cout}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Cout}]
