@@ -1,0 +1,339 @@
+and and5( mint_0[1], ~s[2], s[1], ~s[0] );
+    and and6( mint_0[2], s[2], ~s[1], ~s[0], ~s_b );
+    and and7( mint_0[3], s[2], s[1], ~s[0] );
+
+    or  or2(n_s[0], mint_0[0], mint_0[1] ,mint_0[2], mint_0[3]);
+endmodule
+
+module outputLogic( input logic [2:0]s,
+                    output logic [2:0]l_a, l_b
+);
+    and and1 (l_a[2], 1);
+    or  or1  (l_a[1], ~s[2] & s[1], ~s[0],s[2]&~s[1]);
+    or and2 (l_a[0], s[2]&~s[1], s[1]&~s[0],s[1]&~s[2]);
+    
+    and and3 (l_b[2], 1);
+    or  or2  (l_b[1],~s[0], ~s[2] & s[1],s[2] & s[1]);
+    or and4 (l_b[0], ~s[2]&~s[0], ~s[2]& ~s[1],s[2] & s[1]);
+endmodule
+
+// Module for clock divider to reduce CLK frequency from 100 Mhz to 0.5 Hz
+module clkDivider(	input logic[31:0] divider,
+                    input logic clk, rst,
+                    output logic clk_prime
+);
+    logic [31:0]count = 32'b0;
+    always_ff @( posedge clk, posedge rst) begin
+        if      ( rst == 1 )            count <= 32'b0;
+        else if ( count >= divider - 1) count <= 32'b0;
+        else                            count <= count + 1;
+    end
+    
+    always_ff @(posedge clk, posedge rst) begin
+        if      (rst == 1)              clk_prime <= 32'b0;
+        else if (count == divider - 1)  clk_prime <= ~clk_prime;
+        else                            clk_prime <= clk_prime;
+    end
+endmodule
+
+module trafficLightController( input logic s_a, s_b, clk, rst,
+                               output logic [2:0]l_a, l_b
+);
+    logic[2:0]s;
+    logic[2:0]n_s;
+    logic[31:0]divider = 32'b101111101011110000100000000;
+    logic clk_prime;
+    
+    nextStateLogic nextState(s_a, s_b, s, n_s);
+    clkDivider divide(divider, clk, rst, clk_prime);
+    
+    always_ff@ (posedge clk_prime, posedge rst) begin
+        if (rst) s <= 3'b0;
+        else     s <= n_s;
+    end
+    
+    outputLogic out(s, l_a, l_b);
+endmodule
+
+module trafficLightControllerSimulation(    input logic s_a, s_b, clk, rst,
+                                            output logic [2:0]l_a, l_b
+);
+    logic[2:0]s;
+    logic[2:0]n_s;
+    logic[31:0]divider = 32'b1;
+    logic clk_prime;
+    
+    nextStateLogic nextState(s_a, s_b, s, n_s);
+    clkDivider divide(divider, clk, rst, clk_prime);
+    
+    always_ff@ (posedge clk_prime, posedge rst) begin
+        if (rst) s <= 3'b0;
+        else     s <= n_s;
+    end
+
+
+
+	#set_property IOSTANDARD LVCMOS33 [get_ports {sw[13]}]
+#	set_property IOSTANDARD LVCMOS33 [get_ports {s_b}]
+#set_property PACKAGE_PIN R2 [get_ports {s_a}]					
+	#set_property IOSTANDARD LVCMOS33 [get_ports {s_a}]
+
+## LEDs
+set_property PACKAGE_PIN U16 [get_ports {l_a[2]}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {l_a[2]}]
+set_property PACKAGE_PIN E19 [get_ports {l_a[1]}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {l_a[1]}]
+set_property PACKAGE_PIN U19 [get_ports {l_a[0]}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {l_a[0]}]
+#set_property PACKAGE_PIN V19 [get_ports {led[3]}]					
+	#set_property IOSTANDARD LVCMOS33 [get_ports {led[3]}]
+set_property PACKAGE_PIN W18 [get_ports {l_b[2]}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {l_b[2]}]
+set_property PACKAGE_PIN U15 [get_ports {l_b[1]}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {l_b[1]}]
+set_property PACKAGE_PIN U14 [get_ports {l_b[0]}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {l_b[0]}]
+#set_property PACKAGE_PIN V14 [get_ports {led[7]}]					
+	#set_property IOSTANDARD LVCMOS33 [get_ports {led[7]}]
+#set_property PACKAGE_PIN V13 [get_ports {led[8]}]					
+	#set_property IOSTANDARD LVCMOS33 [get_ports {led[8]}]
+#set_property PACKAGE_PIN V3 [get_ports {led[9]}]					
+	#set_property IOSTANDARD LVCMOS33 [get_ports {led[9]}]
+#set_property PACKAGE_PIN W3 [get_ports {led[10]}]					
+	#set_property IOSTANDARD LVCMOS33 [get_ports {led[10]}]
+#set_property PACKAGE_PIN U3 [get_ports {led[11]}]					
+	#set_property IOSTANDARD LVCMOS33 [get_ports {led[11]}]
+#set_property PACKAGE_PIN P3 [get_ports {led[12]}]					
+	#set_property IOSTANDARD LVCMOS33 [get_ports {led[12]}]
+#	set_property IOSTANDARD LVCMOS33 [get_ports {l_a[0]}]
+#set_property PACKAGE_PIN P1 [get_ports {l_a[1]}]					
+	#set_property IOSTANDARD LVCMOS33 [get_ports {l_a[1]}]
+#set_property PACKAGE_PIN L1 [get_ports {l_a[2]}]					
+	#set_property IOSTANDARD LVCMOS33 [get_ports {l_a[2]}]
+	
+`timescale 1ns / 1ps
+module TwoBitRegister (
+  input wire clk,
+  input wire reset,
+  input wire n_1,n_0,
+  output reg s_1,s_0
+);
+
+  reg q0, q1;
+
+  always_ff @(posedge clk, posedge reset) begin
+    if (reset) begin
+     q0 <= 1'b0;
+     q1<= 1'b0;
+    end else begin
+      q0<=n_0;
+      q1<=n_1;
+    end
+  end
+  assign s_0 = q0;
+  assign s_1 = q1;
+
+endmodule
+
+`timescale 1ns / 1ps
+
+module nextStateLogic(input wire s_1,s_0,t_a,t_b, output wire n_1,n_0);
+assign n_1 = s_1^s_0;
+assign n_0 = ((~s_1)&(~s_0)&(~t_a)) | ((s_1)&(~s_0)&(~t_b));
+endmodule
+
+
+`timescale 1ns / 1ps
+
+module outputLogic(input wire s_1,s_0, output wire l_a1,l_a0,l_b1,l_b0);
+assign l_a1 = s_1;
+assign l_a0 = (~s_1)&s_0;
+assign l_b1 = ~s_1; 
+assign l_b0 = s_1&s_0;
+endmodule
+
+
+`timescale 1ns / 1ps
+
+module Clock_Divider(
+  input wire clk_in,
+  input wire reset,
+  output reg clk_out
+);
+
+  reg [29:0] counter = 0;
+
+  always @(posedge clk_in or posedge reset) begin
+    if (reset) begin
+      counter <= 0;
+      clk_out <= 0;
+    end else begin
+      if (counter == 149999999) begin  // Assuming a 100 MHz original clock  299999999
+        counter <= 0;
+        clk_out <= ~clk_out;
+      end else begin
+        counter <= counter + 1;
+      end
+    end
+  end
+
+endmodule
+
+module outputDecoder (
+    input wire in0,
+    input wire in1,
+    output reg out0,
+    output reg out1,
+    output reg out2);
+
+    // Decoder logic using an if-else statement
+    always_comb begin
+        if (in0 == 1'b0 && in1 == 1'b0) begin
+            out0 = 1'b1;
+            out1 = 1'b0;
+            out2 = 1'b0;;
+        end
+        else if (in0 == 1'b0 && in1 == 1'b1) begin
+            out0 = 1'b0;
+            out1 = 1'b1;
+            out2 = 1'b0;
+        end
+        else if (in0 == 1'b1 && in1 == 1'b0) begin
+            out0 = 1'b0;
+            out1 = 1'b0;
+            out2 = 1'b1;
+        end
+        else begin
+            // Handle any other input combinations if needed
+            out0 = 1'b0;
+            out1 = 1'b0;
+            out2 = 1'b0;
+        end
+    end
+
+endmodule
+
+
+`timescale 1s / 1ps
+module TL_Controller(input wire t_a,t_b,clk,reset,output reg led1,led2,led3,led4,led5,led6);
+wire s1,s0;
+wire n1,n0;
+reg slowClk;
+reg l_a1,l_a0,l_b1,l_b0;
+TwoBitRegister t(slowClk,reset,n1,n0,s1,s0);
+nextStateLogic s(s1,s0,t_a,t_b,n1,n0);
+outputLogic o(s1,s0,l_a1,l_a0,l_b1,l_b0);
+Clock_Divider clock(clk,reset,slowClk);
+always_comb begin
+        if (~l_a1 && ~l_a0) begin
+            led1 = 1'b1;
+            led2 = 1'b1; 
+            led3 = 1'b1;  
+        end
+        else if (~l_a1 && l_a0) begin
+            led1 = 1'b1;  
+            led2 = 1'b1;
+            led3 = 1'b0;  
+        end
+        else if (l_a1 && ~l_a0) begin
+            led1 = 1'b1;  
+            led2 = 1'b0;  
+            led3 = 1'b0;
+        end
+        else begin
+            led1 = 1'b0;
+            led2 = 1'b0;
+            led3 = 1'b0;
+        end
+    end
+    always_comb begin
+        if (~l_b1 && ~l_b0) begin
+            led4 = 1'b1;
+            led5 = 1'b1;  
+            led6 = 1'b1;  
+        end
+        else if (~l_b1 && l_b0) begin
+            led4 = 1'b1;  
+            led5 = 1'b1;
+            led6 = 1'b0;  
+        end
+        else if (l_b1 && ~l_b0) begin
+            led4 = 1'b1;  
+            led5 = 1'b0;  
+            led6 = 1'b0;
+        end
+        else begin
+            led4 = 1'b0;
+            led5 = 1'b0;
+            led6 = 1'b0;
+        end
+    end
+endmodule
+
+
+`timescale 1s / 1ps
+module TL_ControllerD(input wire t_a,t_b,clk,reset,output reg led1,led2,led3,led4,led5,led6);
+wire s1,s0;
+wire n1,n0;
+reg slowClk;
+reg l_a1,l_a0,l_b1,l_b0;
+reg La0,La1,La2,Lb0,Lb1,Lb2;
+TwoBitRegister t(slowClk,reset,n1,n0,s1,s0);
+nextStateLogic s(s1,s0,t_a,t_b,n1,n0);
+outputLogic o(s1,s0,l_a1,l_a0,l_b1,l_b0);
+Clock_Divider clock(clk,reset,slowClk);
+outputDecoder d1(l_a1,l_a0,La0,La1,La2);
+outputDecoder d2(l_b1,l_b0,Lb0,Lb1,Lb2);
+
+always_comb begin
+        if (La0) begin
+            led1 = 1'b1;
+            led2 = 1'b1; 
+            led3 = 1'b1;  
+        end
+        else if (La1) begin
+            led1 = 1'b1;  
+            led2 = 1'b1;
+            led3 = 1'b0;  
+        end
+        else if (La2) begin
+            led1 = 1'b1;  
+            led2 = 1'b0;  
+            led3 = 1'b0;
+        end
+        else begin
+            led1 = 1'b0;
+            led2 = 1'b0;
+            led3 = 1'b0;
+        end
+    end
+    always_comb begin
+        if (Lb0) begin
+            led4 = 1'b1;
+            led5 = 1'b1;  
+            led6 = 1'b1;  
+        end
+        else if (Lb1) begin
+            led4 = 1'b1;  
+            led5 = 1'b1;
+            led6 = 1'b0;  
+        end
+        else if (Lb2) begin
+            led4 = 1'b1;  
+            led5 = 1'b0;  
+            led6 = 1'b0;
+        end
+        else begin
+            led4 = 1'b0;
+            led5 = 1'b0;
+            led6 = 1'b0;
+        end
+    end
+endmodule
+
+
+
+
+
+
+
